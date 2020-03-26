@@ -15,7 +15,7 @@ export default ({ app: { router, $axios }, env }, inject) => {
   // Config app data
   COC.Config.Meta({
     name: pkg.name,
-    brandName: 'Techno Service',
+    brandName: 'Spart',
     version: pkg.version,
     repository: pkg.repository,
     author: pkg.author,

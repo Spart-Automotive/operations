@@ -1,4 +1,4 @@
-<template>
+f<template>
   <Button
     :type = "type"
     :ghost = "plain"
@@ -121,11 +121,13 @@ export default {
     resolveErrorMessage: {
       type: Function,
       default: err => {
+        let body = 'Request Faild.'
+        if (err && err.response && err.response.data)
+          if (err.response.data.message) body = err.response.data.message
+          else if (typeof err.response.data === 'string')
+            body = err.response.data
         return {
-          body:
-            err.response && err.response.data
-              ? err.response.data
-              : 'Request Faild.',
+          body,
           title: 'Whoops!'
         }
       }

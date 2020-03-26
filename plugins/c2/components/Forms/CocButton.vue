@@ -121,11 +121,16 @@ export default {
     resolveErrorMessage: {
       type: Function,
       default: err => {
+        console.log(err)
+        let body = 'Request Faild.'
+        if (err && err.response && err.response.data) {
+          if (err.response.data.message)
+            body = err.response.data.message
+          else
+            body = err.response.data
+        }
         return {
-          body:
-            err.response && err.response.data
-              ? err.response.data
-              : 'Request Faild.',
+          body,
           title: 'Whoops!'
         }
       }
@@ -238,7 +243,7 @@ export default {
       errorStack: [],
       waitingLocalResponse: false,
       networkErrors: null,
-      checkedFormMembers: {}
+      checkedFormMembers: null
     }
   },
   computed: {
@@ -363,7 +368,7 @@ export default {
       'COCFormMeta',
       'COCFormAskForRegister'
     ])
-    this.checkedFormMembers = {}
+    this.checkedFormMembers = null
   },
   methods: {
     construct() {
@@ -405,7 +410,7 @@ export default {
       this.checkedFormMembers = {}
       if (!this.ignore) {
         this.waitingLocalResponse = true
-        console.log('button sending scope: ', this.scope)
+        // console.log('coc button asking for registeration on: ', this.scope)
         this.eventController.Send(null, 'COCFormAskForRegister')
         setTimeout(() => {
           this.eventController.Send({
@@ -467,6 +472,7 @@ export default {
       }
     },
     resolveMessage(message, type) {
+      console.log(message)
       const defaultMessage = {
         type,
         body: '',
@@ -522,7 +528,7 @@ export default {
       if (arguments.length > 0) this.$emit(arguments[0], this.model)
     },
     register(e) {
-      console.log('register')
+      // console.log('coc button implementing registeration on: ', this.scope)
       if (!this.checkedFormMembers) this.checkedFormMembers = {}
       this.checkedFormMembers[e.id] = false
     }

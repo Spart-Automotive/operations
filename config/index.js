@@ -1,6 +1,6 @@
 const defaults = {
-  port: '8080',
+  port: '5060',
   host: 'localhost',
-  baseURL: 'http://localhost:6070/api'
+  baseURL: 'http://localhost:5050/api'
 }
 module.exports = defaults

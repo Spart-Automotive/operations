@@ -1,16 +1,6 @@
 <template>
   <div :class="['layout', { print: onPrint }]">
     <coc-watch-my-window v-model = "win" />
-    <drawer
-      v-model = "addStockModal"
-      width = "90%"
-      class = "coc-background-bg coc-padding-0"
-      footer-hide>
-      <add-stock
-        v-bind = "stockData"
-        class = "coc-margin-top-25px coc-background-bg"
-        @success = "handleAddSuccess" />
-    </drawer>
     <Modal
       v-model = "authModal"
       class = "coc-background-bg"
@@ -48,9 +38,9 @@
         <Sider 
           ref="side1" 
           v-model="isCollapsed"
-          :collapsed-width="78" 
+          :collapsed-width="win && win.isSmall ? 0 : 78" 
           :class = "[{hidden: onPrint}, { responsivesider: win && win.isSmall && !isCollapsed }]"
-          class = "coc-background-bg coc-border-0 coc-border-right-1 coc-border-border"
+          class = "coc-primary-background-bg coc-border-0 coc-border-right-1 coc-border-border"
           hide-trigger 
           collapsible>
           <div
@@ -63,84 +53,31 @@
           </div>
           <Menu 
             :class="menuitemClasses"
-            active-name="jobs" 
+            :active-name="sidebarActive" 
             theme="light" 
             width="auto"
-            class = "coc-background-bg coc-content-text" 
+            class = "coc-primary-background-bg coc-content-text" 
             @on-select = "handleSidebarSelect">
+            <!-- menu items to go -->
             <menu-item
               v-if = "$utils.roles.hasRole('jobs',user)"
-              name="jobs">
-              <i class="tcsc-transportation-icon" />
-              <span>Running</span>
+              name="sections">
+              <i class="knocks-flow-tree" />
+              <span>Sections</span>
             </menu-item>
             <menu-item
-              v-if = "$utils.roles.hasRole('stocks',user)"
-              name="stock">
-              <i class="tcsc-inventory-1-icon" />
-              <span>Add Stock</span>
+              v-if = "$utils.roles.hasRole('jobs',user)"
+              name="vehicles">
+              <i class="knocks-car3" />
+              <span>Vehicles</span>
             </menu-item>
             <menu-item
-              v-if = "$utils.roles.hasRole('stocks',user)"
-              name="moves">
-              <i class="tcsc-stock-icon" />
-              <span>Moves</span>
+              v-if = "$utils.roles.hasRole('jobs',user)"
+              name="brands">
+              <i class="knocksapp-shine" />
+              <span>Brands</span>
             </menu-item>
           </Menu>
-          <div 
-            v-if = "!isCollapsed && sidebarActive === 'jobs' && user && $utils.roles.hasRole('jobs',user)" 
-            class = "row coc-margin-top-30px">
-            <Card 
-              :padding="0" 
-              class = "coc-background-bg coc-content-text"
-              shadow 
-              style="width: 100%;">
-              <p
-                slot = "title"
-                class = "coc-content-text">
-                <icon type = " coc-content-text tcsc-transportation-icon" />
-                <span class = "coc-content-text">Running Jobs</span>
-              </p>
-              <div class="row coc-primary-background-bg coc-margin-y-0 coc-padding-y-3px">
-                <div class="col s12 coc-padding-x-5px">
-                  <coc-input
-                    v-model = "input.job.search"
-                    placeholder = "Search.."
-                    icon = "ios-search"
-                    light-model />
-                </div>
-              </div>
-              <CellGroup
-                v-coc-loading = "loaders.jobs"
-                v-if = "jobs.length"
-                class = "side-jobs">
-                <Cell 
-                  v-for = "(job, j) in jobs" 
-                  :key = "j" 
-                  :label="job.car.model" 
-                  :to = "$route.path == `/jobs/${job.job_no}` ? null : `/jobs/${job.job_no}`"
-                  :selected = "$route.path == `/jobs/${job.job_no}`"
-                  :extra = "$route.path == `/jobs/${job.job_no}` ? null : `#${job.job_no}`"
-                  class = "animated slideInLeft">
-                  <div class = "row coc-house-keeper">
-                    <coc-avatar
-                      :source = "`/snaps/brands/png/${job.car.brand.split(' ').join('-').toLowerCase()}.png`"
-                      scale = "25px"
-                      class = "col coc-padding-x-2px"/>
-                    <span class="col coc-margin-x-0px show-item-name">
-                      {{ job.car.brand | CocCapitalizeName }}
-                    </span>
-                  </div>
-                </Cell>
-              </CellGroup>
-              <CellGroup
-                v-coc-loading = "loaders.jobs"
-                v-if = "!jobs.length"
-                class = "side-jobs">
-                <Cell title = "No Matching Jobs Found"/>
-              </CellGroup>
-            </Card>
-          </div>
         </Sider>
         <Layout>
           <Header :class = "[{hidden: onPrint}]">
@@ -167,40 +104,10 @@
                 </div>
               </div>
               <div class="layout-nav">
+                <!--to go -->
                 <menu-item
-                  v-if = "$utils.roles.hasRole('jobs',user)"
-                  class = "hide-on-small-only"
-                  name="1">
-                  <nuxt-link
-                    to = "/jobs"
-                    class = "coc-secondary-text">
-                    <Icon type="ios-build" />
-                    Jobs
-                  </nuxt-link>
-                </menu-item>
-                <menu-item
-                  v-if = "$utils.roles.hasRole('stocks',user)"
-                  class = "hide-on-small-only"
-                  name="2">
-                  <nuxt-link
-                    to = "/stock"
-                    class = "coc-secondary-text">
-                    <Icon type="ios-archive" />
-                    Stock
-                  </nuxt-link>
-                </menu-item>
-                <menu-item
-                  v-if = "$utils.roles.dashboarder(user)"
-                  class = "hide-on-small-only"
-                  name="3">
-                  <nuxt-link
-                    to = "/analytics"
-                    class = "coc-secondary-text">
-                    <Icon type="ios-analytics" />
-                    Analytics
-                  </nuxt-link>
-                </menu-item>
-                <menu-item name="4">
+                  name="4"
+                  class = "right">
                   <span 
                     v-if = "!user" 
                     class = " coc-text-normal-1 ivu-icon ivu-icon-ios-log-in hide-on-med-and-up" 
@@ -230,36 +137,6 @@
                           to = "/profile">
                           <icon type = " knocks-user2" />
                           Profile
-                        </nuxt-link>
-                      </DropdownItem>
-                      <DropdownItem
-                        v-if = "$utils.roles.hasRole('jobs',user)"
-                        class = "hide-on-med-and-up coc-border-0 coc-border-bottom-1 coc-border-border">
-                        <nuxt-link
-                          to = "/jobs"
-                          class = "coc-primary-shade-2-text coc-primary-hover-shade-4-text coc-text-normal-1 text coc-text-hover-normal-2 coc-smooth-font-size full-width block">
-                          <Icon type="ios-build" />
-                          Jobs
-                        </nuxt-link>
-                      </DropdownItem>
-                      <DropdownItem
-                        v-if = "$utils.roles.hasRole('stocks',user)"
-                        class = "hide-on-med-and-up coc-border-0 coc-border-bottom-1 coc-border-border">
-                        <nuxt-link
-                          to = "/stock"
-                          class = "coc-primary-shade-2-text coc-primary-hover-shade-4-text coc-text-normal-1 text coc-text-hover-normal-2 coc-smooth-font-size full-width block">
-                          <Icon type="ios-archive" />
-                          Stock
-                        </nuxt-link>
-                      </DropdownItem>
-                      <DropdownItem
-                        v-if = "$utils.roles.dashboarder(user)"
-                        class = "coc-border-0 coc-border-bottom-1 coc-border-border hide-on-med-and-up">
-                        <nuxt-link
-                          to = "/analytics"
-                          class = "coc-primary-shade-2-text coc-primary-hover-shade-4-text coc-text-normal-1 text coc-text-hover-normal-2 coc-smooth-font-size full-width block">
-                          <Icon type="ios-analytics" />
-                          Analytics
                         </nuxt-link>
                       </DropdownItem>
                       <DropdownItem
@@ -298,12 +175,18 @@
             </Menu>
           </Header>
           <Content
-            :style="{padding: '0 2vw'}"
-            :class = "[ { 'white content-print': onPrint }, { 'black-text': onPrint } ]"
-            class = "coc-primary-background-bg coc-content-text">
+            :style="{padding: '0'}"
+            :class = "[
+              { 'white content-print': onPrint },
+              { 'black-text': onPrint },
+              { 'coc-primary-background-bg': win && !win.isSmall },
+              { 'coc-background-bg': win && win.isSmall },
+              'coc-content-text'
+          ]">
             <Breadcrumb
               v-if = "!onPrint"
-              :style="{margin: '20px 0'}">
+              :style="{margin: '20px 0'}"
+              class = "coc-margin-left-10px">
               <BreadcrumbItem 
                 v-for = "(crumb, c) in analysisBreadcrump()" 
                 :key = "c"
@@ -339,7 +222,16 @@
                 <span class="coc-text-md-1"><Icon type= "ios-navigate"/>{{ $store.state.core.app.address }}</span>
               </p>
             </Card>
-            <Card :class = "[ { white: onPrint }, { 'black-text coc-border-0': onPrint } ]">
+            <Card 
+              :padding = "win && win.isSmall ? 5 : 16"
+              :class = "[
+                'coc-none-border-radius',
+                'coc-border-right-0',
+                'coc-border-left-0',
+                { white: onPrint },
+                { 'black-text coc-border-0': onPrint },
+                { 'coc-border-0': win && win.isSmall },
+            ]">
               <div style="min-height: 70vh;">
                 <slot />
               </div>
@@ -351,10 +243,10 @@
             class="layout-footer-center coc-primary-background-bg">
             <span 
               class = "">
-              <b style="font-family: jura; font-weight: bold; font-size: 120%">TUATARA</b> <span style="font-family: jura;" >GMS </span> by
+              <b style="font-family: jura; font-weight: bold; font-size: 120%">Spart</b>  by
               <icon 
                 type = "logo-twitter" 
-                class = "blue-text" /> @mamr_moussa 2019&copy; </span>
+                class = "blue-text" /> @coc.js 2020&copy; </span>
           </Footer>
           <Footer
             v-else
@@ -362,10 +254,10 @@
             class="layout-footer-center coc-primary-background-bg print-footer">
             <span 
               class = "">
-              <b style="font-family: jura; font-weight: bold; font-size: 120%">TUATARA</b> <span style="font-family: jura;" >GMS </span> by
+              <b style="font-family: jura; font-weight: bold; font-size: 120%">Spart</b>  by
               <icon 
                 type = "logo-twitter" 
-                class = "blue-text" /> @mamr_moussa 2019 &copy; </span>
+                class = "blue-text" /> @coc.js 2020 &copy; </span>
           </Footer>
         </Layout>
       </Layout>
@@ -376,13 +268,11 @@
 import config from '~/config'
 import Login from '../auth/Login.vue'
 import Register from '../auth/Register.vue'
-import AddStock from '~/components/stock/add.vue'
 export default {
   name: 'Master',
   components: {
     Login,
-    Register,
-    AddStock
+    Register
   },
   props: {
     crumbs: {
@@ -392,6 +282,10 @@ export default {
     onPrint: {
       type: Boolean,
       default: false
+    },
+    sidebarStarter: {
+      type: String,
+      default: null
     }
   },
   data() {
@@ -418,24 +312,6 @@ export default {
     }
   },
   computed: {
-    jobs() {
-      return this.$store.state.jobs.running.filter(
-        j =>
-          j.job_no.toString().includes(this.input.job.search) ||
-          j.car.brand
-            .toLowerCase()
-            .includes(this.input.job.search.toLowerCase()) ||
-          j.car.model
-            .toLowerCase()
-            .includes(this.input.job.search.toLowerCase()) ||
-          j.client.name
-            .toLowerCase()
-            .includes(this.input.job.search.toLowerCase()) ||
-          j.client.phone
-            .toLowerCase()
-            .includes(this.input.job.search.toLowerCase())
-      )
-    },
     user() {
       return this.$store.state.core.auth
     },
@@ -472,8 +348,8 @@ export default {
     }
   },
   mounted() {
+    if (this.sidebarStarter) this.sidebarActive = this.sidebarStarter
     const vm = this
-    this.getJobs()
     this.events.OnMap({
       askForLogin(e) {
         if (e && e.mode && e.mode === 'register') {
@@ -490,45 +366,22 @@ export default {
         setTimeout(() => {
           vm.getJobs()
         }, 3000)
-      },
-      addStock(e) {
-        if (e) {
-          vm.stockData = e
-        } else vm.stockData = null
-        vm.addStockModal = true
       }
     })
     if (this.win && this.win.isSmall) this.isCollapsed = true
   },
   methods: {
-    getJobs() {
-      this.loaders.jobs = true
-      this.$axios({
-        method: 'get',
-        url: '/job',
-        params: { status: 'running', stats: 'yes' }
-      })
-        .then(({ data: { jobs } }) => {
-          this.loaders.jobs = false
-          this.$store.dispatch('setRunningJobs', jobs)
-        })
-        .catch(() => {
-          this.loaders.jobs = false
-        })
-    },
     handleSidebarSelect(e) {
       this.sidebarActive = e
       this.isCollapsed = false
-      if (e === 'jobs') {
-        this.getJobs()
-      } else if (e === 'stock') {
-        this.stockData = {
-          mode: 'post',
-          init: null
-        }
-        this.addStockModal = true
-      } else if (e === 'moves') {
-        this.$router.push('/moves')
+      if (e === 'sections') {
+        this.$router.push('/sections')
+      }
+      if (e === 'brands') {
+        this.$router.push('/brands')
+      }
+      if (e === 'vehicles') {
+        this.$router.push('/vehicles')
       }
     },
     collapsedSider() {
@@ -548,14 +401,6 @@ export default {
       })
       this.$axios.defaults.headers.common['Authorization'] = null
       this.$store.dispatch('setAuth', null)
-    },
-    handleAddSuccess(e) {
-      this.stockData = {
-        mode: 'post',
-        init: null
-      }
-      this.addStockModal = false
-      this.$root.$emit('addStockSuccess', e)
     },
     analysisBreadcrump(appendDashboard = true) {
       const psudoAppend = []
@@ -667,7 +512,7 @@ export default {
 }
 .ivu-layout-header,
 .ivu-menu-dark {
-  background-color: #171d22;
+  background-color: #000;
 }
 .responsivesider {
   position: fixed;
@@ -683,5 +528,8 @@ export default {
 }
 .content-print {
   padding-bottom: 103px !important;
+}
+.ivu-layout-sider-children {
+  min-height: 100vh !important;
 }
 </style>

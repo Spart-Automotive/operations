@@ -48,6 +48,7 @@
       :placement = "placement"
       :transfer = "transfer"
       :name = "name"
+      :allow-create = "allowCreate"
       :auto-complete = "autoComplete"
       :element-id = "componentId"
       @input = "handleInput"
@@ -124,6 +125,10 @@ export default {
       default: ''
     },
     multiple: {
+      type: Boolean,
+      default: false
+    },
+    allowCreate: {
       type: Boolean,
       default: false
     },

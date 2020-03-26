@@ -1,181 +1,60 @@
 
 <template>
-  <master :on-print = "onPrintDemo">
+  <master
+    :crumbs = "['sections', init ? init.name : 'Loading..']"
+    sidebar-starter = "sections">
     <div
       class="coc-container">
-      Try Print Layout
-      <i-switch v-model = "onPrintDemo" />
       <div
         v-if = "init"
         class = "col s12 coc-border-0">
-        <h3 class = "coc-content-text coc-text-heading">App Data</h3>
+        <h1 class = "coc-content-text coc-text-title">{{ init.name }}</h1>
         <coc-input
-          v-model = "appForm.title"
+          v-model = "appForm.name"
           :rules = "{ HasValue: true }"
-          :scope = "['app-form']"
-          placeholder = "Title"
+          :scope = "['edit-section']"
+          placeholder = "Name"
           size = "large"
           icon = "ios-card"
           light-model
           labeled/>
         <coc-input
-          v-model = "appForm.subtitle"
+          v-model = "appForm.about"
           :rules = "{ HasValue: true }"
-          :scope = "['app-form']"
-          placeholder = "Subtitle"
+          :scope = "['edit-section']"
+          placeholder = "About"
           size = "large"
           icon = "ios-card-outline"
           light-model
           labeled/>
-        <coc-input
-          v-model = "appForm.address"
+        <coc-select
+          v-model = "appForm.vehicles"
+          :rules = "{ }"
+          :scope = "['edit-section']"
+          placeholder = "Section Vehicles"
+          multiple
+          filterable
+          labeled />
+        <coc-select
+          v-model = "appForm.keywords"
           :rules = "{ HasValue: true }"
-          :scope = "['app-form']"
-          placeholder = "Address"
-          size = "large"
-          icon = "ios-navigate"
-          light-model
-          labeled/>
-        <coc-input
-          v-model = "appForm.currency"
-          :rules = "{ HasValue: true }"
-          :scope = "['app-form']"
-          placeholder = "Currency"
-          size = "large"
-          icon = "ios-cash"
-          light-model
-          labeled/>
-      </div>
-      <div>
-        <divider class = "coc-border-bg coc-border-border"/>
-        <div
-          v-if = "init"
-          class = "row">
-          <h3 class = "coc-content-text coc-text-heading">
-            Phone Numbers
-            ({{ appForm.phones.length }})
-          </h3>
-          <cell-group>
-            <cell
-              v-for = "(phone, p) in appForm.phones"
-              :key = "p"
-              class = "coc-border-tint-5-bg coc-border-0 coc-border-bottom-1 coc-border-border">
-              <span class="coc-text-bold">{{ phone }}</span>
-              <i-button
-                slot = "extra"
-                icon = "ios-trash-outline coc-error-text"
-                type = "text"
-                @click = "appForm.phones.splice(p, 1)"/>
-            </cell>
-          </cell-group>
-          <coc-input
-            v-model = "phoneInput"
-            :rules = "{ HasValue: true }"
-            :scope = "['add-phone']"
-            placeholder = "Phone"
-            icon = "ios-phone"
-            size = "large"
-            light-model
-            labeled>
-            <coc-button
-              slot = "append"
-              :scope = "['add-phone']"
-              classes = "coc-content-text coc-border-0"
-              type = "text"
-              style = "width: 70px"
-              icon = "ios-add-circle-outline coc-content-text"
-              local
-              reset
-              @coc-validation-passed = "appForm.phones.push(phoneInput)" />
-          </coc-input>
-        </div>
-        <divider class = "coc-border-bg coc-border-border"/>
-        <div
-          v-if = "init"
-          class = "row">
-          <h3 class = "coc-content-text coc-text-heading">
-            Promotions
-            ({{ appForm.promotions.length }})
-          </h3>
-          <cell-group>
-            <cell
-              v-for = "(promotion, p) in appForm.promotions"
-              :key = "p"
-              class = "coc-border-tint-5-bg coc-border-0 coc-border-bottom-1 coc-border-border">
-              <span class="coc-text-bold">
-                {{ promotion.name | CocCapitalizeName }}
-              </span>
-              <span slot = "label">
-                {{ promotion.amount }} {{ promotion.type === 'percentage' ? '%' : appForm.currency }}
-              </span>
-              <i-button
-                slot = "extra"
-                icon = "ios-trash-outline coc-error-text"
-                type = "text"
-                @click = "appForm.promotions.splice(p, 1)"/>
-            </cell>
-          </cell-group>
-          <div class="col l4 s12">
-            <coc-input
-              v-model = "promotionForm.name"
-              :scope = "['promotion-form']"
-              :rules = "{ HasValue: true }"
-              placeholder = "Name"
-              size = "large"
-              light-model
-              labeled/>
-          </div>
-          <div class="col l4 s12">
-            <coc-input
-              :scope = "['promotion-form']"
-              :rules = "{ HasValue: true, IsNumericString: true, NumberGreaterThan: 0 }"
-              filters = "ToFloat"
-              placeholder = "Amount"
-              size = "large"
-              light-model
-              labeled
-              @filter = "promotionForm.amount = $event"/>
-          </div>
-          <div class="col l4 s12">
-            <coc-select
-              v-model = "promotionForm.type"
-              :scope = "['promotion-form']"
-              :rules = "{ HasValue: true }"
-              placeholder = "Type"
-              size = "large"
-              light-model
-              labeled>
-              <Option
-                label = "Fixed Amount"
-                value = "fixed" />
-              <Option
-                label = "Percentage"
-                value = "percentage" />
-            </coc-select>
-          </div>
-          <div class="col s12">
-            <coc-button
-              :scope = "['promotion-form']"
-              placeholder = "Add Promotion"
-              type = "default"
-              icon = "ios-add-circle"
-              class = "right"
-              local
-              labeled
-              @coc-validation-passed = "appForm.promotions.push($_.clone(promotionForm))" />
-          </div>
-        </div>
+          :scope = "['edit-section']"
+          placeholder = "Section Keywords"
+          multiple
+          allow-create
+          filterable
+          labeled />
       </div>
       <div
         v-if = "init"
         class = "row">
         <coc-button
           v-if = "init"
-          :scope = "['app-form']"
+          :scope = "['edit-section']"
           :request = "{
             method: 'put',
             xdata: $_.omit(appForm, ['_id', '__v']),
-            url: `/app`
+            url: `/section/${$route.params.id}`
           }"
           type = "primary"
           size = "large"
@@ -320,14 +199,10 @@ export default {
   },
   data() {
     return {
+      init: null,
       phoneInput: '',
       source: null,
       onPrintDemo: false,
-      promotionForm: {
-        name: '',
-        type: '',
-        amount: ''
-      },
       app: null,
       appForm: { name: '', roles: [] },
       // appForm.background_redirect: { url: '', placeholder: '' },
@@ -340,9 +215,6 @@ export default {
     }
   },
   computed: {
-    init() {
-      return this.$store.state.core.app
-    },
     auth() {
       return this.$store.state.core.auth
     },
@@ -350,31 +222,28 @@ export default {
       return this.$store.state.core.auth
     },
     avatarUrl() {
-      return this.user ? `${config.baseURL}/app/background` : null
+      return `${config.baseURL}/section/${this.$route.params.id}/image`
     },
     avatar() {
-      return this.init && this.init.background
-        ? `${config.baseURL}/app/background`
+      return this.init && this.init.image
+        ? `${config.baseURL}/section/${this.$route.params.id}/image`
         : null
     }
   },
   watch: {
-    init: {
-      deep: true,
-      immediate: true,
-      handler(val) {
-        if (val) {
-          this.app = this.$_.cloneDeep(val)
-          this.appForm = this.$_.cloneDeep(val)
-          // this.appForm.background_redirect = this.$_.cloneDeep(val.background_redirect)
-        }
-      }
-    }
+    //
   },
   mounted() {
     //
+    this.getInit()
   },
   methods: {
+    getInit() {
+      this.$axios.get(`/section/${this.$route.params.id}`).then(res => {
+        this.init = res.data
+        this.appForm = this.$_.cloneDeep(this.init)
+      })
+    },
     handleUpdateSuccess({ meta: { response } }) {
       this.$store.dispatch('setApp', response)
     },
@@ -397,7 +266,7 @@ export default {
     uploadAvatar() {
       if (this.imagesFiles && this.imagesFiles.length) {
         this.uploadFD = new FormData()
-        this.uploadFD.append('avatar', this.imagesFiles[0])
+        this.uploadFD.append('file', this.imagesFiles[0])
         this.uploadRetriever.loading = true
         setTimeout(() => {
           this.$axios({
@@ -409,6 +278,7 @@ export default {
               this.handleUploadSuccess({ response: res.data })
             })
             .catch(err => {
+              this.uploadRetriever.loading = false
               this.$Message.error({
                 content: error.response
               })
@@ -428,7 +298,7 @@ export default {
       this.uploadRetriever.loading = true
       const data = e.response
       const tempData = this.$_.cloneDeep(data)
-      tempData.avatar = null
+      tempData.file = null
       this.$store.dispatch('setApp', tempData)
       setTimeout(() => {
         this.$Message.success({
