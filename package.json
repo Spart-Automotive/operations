@@ -35,7 +35,7 @@
     "vue-carousel": "^0.18.0"
   },
   "devDependencies": {
-    "ajv": "^6.5.5",
+    "ajv": "^6.12.3",
     "babel-eslint": "^8.2.1",
     "babel-plugin-component": "^1.1.1",
     "chai": "^4.2.0",
